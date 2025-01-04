@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"strings"
 
+	"html"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
 const (
-	baseUrl = "https://www.letras.mus.br"
+	baseUrl       = "https://www.letras.mus.br"
+	lyricCSSClass = ".lyric-original"
 )
 
 var fullLyrics string
@@ -29,12 +32,12 @@ func GetLyricsFromLetrasMus(artist string, song string) (string, error) {
 		log.Fatalf("LetrasMusServiceError: status code error: %d %s", resp.StatusCode, resp.Status)
 	}
 
-	html, err := goquery.NewDocumentFromReader(resp.Body)
+	htmlDocument, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return "", errors.New("LetrasMusServiceError: can't read html content")
 	}
 
-	html.Find(".lyric-original").Each(func(i int, s *goquery.Selection) {
+	htmlDocument.Find(lyricCSSClass).Each(func(i int, s *goquery.Selection) {
 
 		s.Find("p").Each(func(i int, s *goquery.Selection) {
 			verses, _ := s.Html()
@@ -42,6 +45,8 @@ func GetLyricsFromLetrasMus(artist string, song string) (string, error) {
 		})
 
 	})
+
+	fullLyrics = html.UnescapeString(fullLyrics)
 
 	return fullLyrics, nil
 }
