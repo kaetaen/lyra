@@ -14,11 +14,9 @@ const (
 	baseUrl = "https://www.letras.mus.br"
 )
 
-type LetrasMus struct{}
-
 var fullLyrics string
 
-func (l LetrasMus) GetLyrics(artist string, song string) (string, error) {
+func GetLyricsFromLetrasMus(artist string, song string) (string, error) {
 	uri := fmt.Sprintf("%s/%s/%s", baseUrl, artist, song)
 	resp, err := http.Get(uri)
 
